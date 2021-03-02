@@ -1,0 +1,678 @@
+<!-- Page Wrapper -->
+<div id="wrapper">
+
+  <!-- Sidebar -->
+  <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar" #accordionSidebar>
+
+    <!-- Sidebar - Brand -->
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="cms/#">
+      <div class="sidebar-brand-icon">
+        <img src="/assets/public/compatee icon.png"/>
+      </div>
+      <div class="sidebar-brand-text mx-3">Compatee </div>
+    </a>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider my-0">
+
+    <!-- Nav Item - Dashboard -->
+    <li class="nav-item">
+      <a class="nav-link" href="cms/#" (click)="goToMainPage()">
+        <i class="fas fa-fw fa-eye"></i>
+        <span>Main Page</span></a>
+    </li>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+
+    <!-- Heading -->
+    <div class="sidebar-heading">
+      Interface
+    </div>
+
+    <!-- Nav Item - Pages Collapse Menu -->
+    <li [ngClass]="(this.sideButtons == 'questions')?'nav-item active':'nav-item'">
+      <a class="nav-link" (click)="toggleSideButtons('questions')">
+        <i class="fas fa-fw fa-question-circle"></i>
+        <span>Questions</span>
+      </a>
+    </li>
+
+    <!-- Nav Item - Pages Collapse Menu -->
+    <li [ngClass]="(this.sideButtons == 'contenthub')?'nav-item active':'nav-item'">
+      <a class="nav-link" (click)="toggleSideButtons('contentHub')">
+        <i class="fas fa-fw fa-book"></i>
+        <span> Content Hub</span>
+      </a>
+    </li>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider d-none d-md-block">
+
+    <!-- Sidebar Toggler (Sidebar) -->
+    <div class="text-center d-none d-md-inline">
+      <button class="rounded-circle border-0" id="sidebarToggle" (click)="toggleClass(accordionSidebar)"></button>
+    </div>
+
+
+  </ul>
+  <!-- End of Sidebar -->
+
+  <!-- Content Wrapper -->
+  <div id="content-wrapper" class="d-flex flex-column">
+
+    <!-- Main Content -->
+    <div id="content">
+
+      <!-- Topbar -->
+      <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+        <!-- Sidebar Toggle (Topbar) -->
+        <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3"
+          (click)="toggleClass(accordionSidebar)">
+          <i class="fa fa-bars"></i>
+        </button>
+
+        <div  class="navbar-nav ml-auto" style="font-weight: 700;font-size: 24px;color: #414c64;font-family:'Raleway, sans-serif';">Compatee Admin Dashboard<sup>beta</sup> </div>
+				
+
+        <!-- Topbar Navbar -->
+        <ul class="navbar-nav ml-auto">
+
+        
+          <div class="topbar-divider d-none d-sm-block"></div>
+
+          <!-- Nav Item - User Information -->
+          <li class="nav-item dropdown no-arrow" #profileDropdown>
+            <a class="nav-link dropdown-toggle" id="userDropdown" role="button" data-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false" (click)="toggleClassProfile(profileDropdown)">
+              <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ UserName }}</span>
+              <img class="img-profile rounded-circle" src="/assets/public/undraw_profile.svg">
+            </a>
+            <!-- Dropdown - User Information -->
+            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+              <a class="dropdown-item" href="cms/#">
+                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                Profile
+              </a>
+              <a class="dropdown-item" href="cms/#">
+                <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
+                Settings
+              </a>
+              <a class="dropdown-item" href="cms/#">
+                <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
+                Activity Log
+              </a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item"  (click)="logoutPopup(logoutModal)" (click)="toggleClassProfile(profileDropdown)">
+                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400" ></i>
+                Logout
+              </a>
+            </div>
+          </li>
+
+        </ul>
+
+      </nav>
+      <!-- End of Topbar -->
+
+      <!-- Begin Page Content -->
+      <div class="container-fluid">
+
+
+        <div style="width: 100%">
+          <mat-tab-group (selectedIndexChange)="_setDataSource($event)" *ngIf="this.sideButtons == 'questions'">
+
+            <mat-tab label="Category" style="align-self: center">
+              <br />
+              <div style="height: 28px; display: flex; flex-direction: row-reverse">
+                <button mat-button (click)="openDialog('Add', { category: this.maxCategoryNumber })" mat-flat-button
+                  color="primary" style="position: absolute" *ngIf="this.UserRole == 'admin'">
+                  Add Category
+                </button>
+                <br />
+              </div>
+              <div style="margin-top:10px;display: flex; flex-direction: row-reverse">
+                <button mat-mini-fab (click)="resetFilters()" color="primary">
+                <mat-icon>filter_list</mat-icon>
+              </button>
+              </div>
+              
+              <br />
+
+              <div class="mat-elevation-z8">
+                <table mat-table [dataSource]="categorydataSource" #sort="matSort" matSort matSortActive="category"
+                  matSortDirection="desc">
+                  <!-- Name Column -->
+                  <ng-container matColumnDef="category">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                      Category No
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                      {{ element.category }}
+                    </td>
+                  </ng-container>
+
+                  <!-- Weight Column -->
+                  <ng-container matColumnDef="categoryName">
+                    <th mat-header-cell *matHeaderCellDef>
+                      <div mat-sort-header *ngIf="this.filterbuttonValue">Category Name</div>  
+                      <div *ngIf="!this.filterbuttonValue">
+                        <mat-form-field class="filter" floatLabel="never">
+                          <mat-label>Category Name</mat-label>
+                          <input matInput [formControl]="catFilter">
+                        </mat-form-field>
+                      </div>
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                      {{ element.categoryName }}
+                    </td>
+                  </ng-container>
+
+                  <!-- Action Column -->
+                  <ng-container matColumnDef="action">
+                    <th mat-header-cell *matHeaderCellDef>Action</th>
+                    <td mat-cell *matCellDef="let element" class="action-link">
+                      <button mat-mini-fab (click)="openDialog('Update', element)" color="primary"
+                        aria-label="Example icon button with a delete icon" *ngIf="this.UserRole == 'admin'">
+                        <mat-icon>edit</mat-icon>
+                      </button>
+                      &nbsp;
+                      <button mat-mini-fab (click)="openDialog('Delete', element)" color="warn"
+                        aria-label="Example icon button with a delete icon" *ngIf="this.UserRole == 'admin'">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </td>
+                  </ng-container>
+
+                  <tr mat-header-row *matHeaderRowDef="categoryDisplayedColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: categoryDisplayedColumns"></tr>
+                </table>
+
+                <mat-paginator #paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons>
+                </mat-paginator>
+              </div>
+            </mat-tab>
+            <mat-tab label="Sub-Category">
+              <br />
+              <div style="height: 28px; display: flex; flex-direction: row-reverse" >
+                <button mat-button (click)="
+                openSubDialog('Add', { subcategory: this.maxSubCategoryNumber })
+              " mat-flat-button color="primary" style="position: absolute" *ngIf="this.UserRole == 'admin'">
+                  Add Sub-Category
+                </button>
+                <br />
+              </div>
+              <div style="margin-top:10px;display: flex; flex-direction: row-reverse">
+                <button mat-mini-fab (click)="resetFilters()" color="primary">
+                <mat-icon>filter_list</mat-icon>
+              </button>
+              </div>
+              
+              <br />
+            
+              
+              <div class="mat-elevation-z8">
+                <table mat-table [dataSource]="subcategorydataSource" #sort1="matSort" matSort
+                  matSortActive="subcategory" matSortDirection="desc">
+                  <!-- Name Column -->
+                  <ng-container matColumnDef="subcategory">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                      Sub-Category No
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                      {{ element.subcategory }}
+                    </td>
+                  </ng-container>
+
+                  <!-- Weight Column -->
+                  <ng-container matColumnDef="category">
+                    <th mat-header-cell *matHeaderCellDef>
+                      <div mat-sort-header *ngIf="this.filterbuttonValue">Category Name</div>  
+                      <div *ngIf="!this.filterbuttonValue">                    
+                      <mat-form-field class="filter" floatLabel="never">
+                        <mat-label>Category Name</mat-label>
+                        <mat-select [formControl]="subCatnoFilter">
+                          <mat-option value=''>Select Category</mat-option>
+                          <mat-option
+                            *ngFor="let category of categoryData"
+                            [value]="category.category"
+                          >
+                            {{ category.categoryName }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                      
+                    </div>
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                      {{ getCategoryName(element.category) }}
+                    </td>
+                  </ng-container>
+
+                  <!-- Weight Column -->
+                  <ng-container matColumnDef="subcategoryName">
+                    <th mat-header-cell *matHeaderCellDef>                      
+                      <div mat-sort-header *ngIf="this.filterbuttonValue">Sub-Category Name</div>  
+                      <div *ngIf="!this.filterbuttonValue">                    
+                      <mat-form-field class="filter" floatLabel="never">
+                        <mat-label>Sub-Category Name</mat-label>
+                        <input matInput [formControl]="subCatnameFilter">
+                      </mat-form-field>
+                    </div>
+                    </th>
+                      
+                    <td mat-cell *matCellDef="let element">
+                      {{ element.subcategoryName }}
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="positiveKeyword">
+                    <th mat-header-cell *matHeaderCellDef>
+                      <div mat-sort-header *ngIf="this.filterbuttonValue">Positive</div>  
+                      <div *ngIf="!this.filterbuttonValue">
+                      <mat-form-field class="filter" floatLabel="never">
+                        <mat-label>Positive</mat-label>
+                        <input matInput [formControl]="subCatPositiveFilter">
+                      </mat-form-field>
+                    </div>
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                      {{ element.positiveKeyword }}
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="negativeKeyword">
+                    <th mat-header-cell *matHeaderCellDef>
+                      <div mat-sort-header *ngIf="this.filterbuttonValue">Negative</div>  
+                      <div *ngIf="!this.filterbuttonValue">                      
+                      <mat-form-field class="filter" floatLabel="never">
+                        <mat-label>Negative</mat-label>
+                        <input matInput [formControl]="subCatNegativeFilter">
+                      </mat-form-field>
+                    </div>
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                      {{ element.negativeKeyword }}
+                    </td>
+                  </ng-container>
+
+                  <!-- Action Column -->
+                  <ng-container matColumnDef="action">
+                    <th mat-header-cell *matHeaderCellDef>Action</th>
+                    <td mat-cell *matCellDef="let element" class="action-link">
+                      <button mat-mini-fab (click)="openSubDialog('Update', element)" color="primary"
+                        aria-label="Example icon button with a delete icon" *ngIf="this.UserRole == 'admin'">
+                        <mat-icon>edit</mat-icon>
+                      </button>
+                      &nbsp;
+                      <button mat-mini-fab (click)="openSubDialog('Delete', element)" color="warn"
+                        aria-label="Example icon button with a delete icon" *ngIf="this.UserRole == 'admin'">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </td>
+                  </ng-container>
+
+                  <tr mat-header-row *matHeaderRowDef="subcategoryDisplayedColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: subcategoryDisplayedColumns"></tr>
+                </table>
+
+                <mat-paginator #paginator2 [pageSize]="10" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons>
+                </mat-paginator>
+              </div>
+            </mat-tab>
+            <mat-tab label="Questions">
+              <br />
+              <div style="height: 28px; display: flex; flex-direction: row-reverse">
+                <button mat-button (click)="openQueDialog('Add', { questionNo: this.maxQuestionNumber })"
+                  mat-flat-button color="primary" style="position: absolute" *ngIf="this.UserRole != 'user'" >
+                  Add Questions
+                </button>
+                <br />
+              </div>
+              <div style="margin-top:10px;display: flex; flex-direction: row-reverse">
+                <button mat-mini-fab (click)="resetFilters()" color="primary">
+                <mat-icon>filter_list</mat-icon>
+              </button>
+              </div>
+              <br />
+
+              <div class="mat-elevation-z8">
+                <table mat-table [dataSource]="questionsdataSource" #sort2="matSort" matSort matSortActive="questionNo"
+                  matSortDirection="desc">
+                  <ng-container matColumnDef="questionNo">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Question No</th>
+                    <td mat-cell *matCellDef="let element">
+                      {{ element.questionNo }}
+                    </td>
+                  </ng-container>
+                  <!-- Name Column -->
+                  <ng-container matColumnDef="questions">
+                    <th mat-header-cell *matHeaderCellDef>
+                      <div mat-sort-header *ngIf="this.filterbuttonValue">Questions</div>  
+                      <div *ngIf="!this.filterbuttonValue">
+                      <mat-form-field class="filter" floatLabel="never" style="width: 90%;">
+                        <mat-label>Questions</mat-label>
+                        <input matInput [formControl]="queNamefilter">
+                      </mat-form-field>
+                    </div>
+                      </th>
+                    <td mat-cell *matCellDef="let element" style="max-width:250px;"> 
+                      {{ element.questions }}
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="category">
+                    <th mat-header-cell *matHeaderCellDef>
+                      <div mat-sort-header *ngIf="this.filterbuttonValue">Category Name</div>  
+                      <div *ngIf="!this.filterbuttonValue">                    
+                      <mat-form-field class="filter" floatLabel="never" style="padding-right: 10px;">
+                        <mat-label>Category Name</mat-label>
+                        <mat-select [formControl]="queCatnoFilter">
+                          <mat-option value=''>Select Category</mat-option>
+                          <mat-option
+                            *ngFor="let category of categoryData"
+                            [value]="category.category"
+                          >
+                            {{ category.categoryName }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                      
+                    </div>
+                    </th>
+                    <td mat-cell *matCellDef="let element" style="padding-left: 10px;">
+                      {{ getCategoryName(element.category) }}
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="subcategory">
+                    <th mat-header-cell *matHeaderCellDef>
+                      <div mat-sort-header *ngIf="this.filterbuttonValue">Sub-Category Name</div>  
+                      <div *ngIf="!this.filterbuttonValue">                    
+                      <mat-form-field class="filter" floatLabel="never" style="padding-right: 10px;">
+                        <mat-label>Sub-Category Name</mat-label>
+                        <mat-select [formControl]="queSubCatnoFilter">
+                          <mat-option value=''>Select Sub-Category</mat-option>
+                          <mat-option
+                            *ngFor="let subcategory of subcategoryData"
+                            [value]="subcategory.subcategory"
+                          >
+                            {{ subcategory.subcategoryName }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                      
+                    </div>
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                      {{ getSubCategoryName(element.subcategory) }}
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="questionFor">
+                    <th mat-header-cell *matHeaderCellDef>
+                      <div mat-sort-header *ngIf="this.filterbuttonValue">question For</div>  
+                      <div *ngIf="!this.filterbuttonValue">                    
+                      <mat-form-field class="filter" floatLabel="never" style="padding-right: 10px;">
+                        <mat-label>question For</mat-label>
+                        <mat-select [formControl]="queForFilter">
+                          <mat-option value=''>Select Question For</mat-option>
+                          <mat-option value=1>Single</mat-option>
+                          <mat-option value=2>Couple</mat-option>
+                          <mat-option value=0>Both</mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                      
+                    </div>
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                      {{ questionsFors[element.questionFor] }}
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="criteria">
+                    <th mat-header-cell *matHeaderCellDef>Criteria</th>
+                    <td mat-cell *matCellDef="let element">
+                      {{ element.criteria }}
+                    </td>
+                  </ng-container>
+
+                  <!-- Action Column -->
+                  <ng-container matColumnDef="action">
+                    <th mat-header-cell *matHeaderCellDef>Action</th>
+                    <td mat-cell *matCellDef="let element" class="action-link">
+                      <button mat-mini-fab (click)="openQueDialog('Update', element)" color="primary"
+                        aria-label="Example icon button with a delete icon" *ngIf="this.UserRole == 'admin' || this.UserRole == 'publisher'">
+                        <mat-icon>edit</mat-icon>
+                      </button>
+                      &nbsp;
+                      <button mat-mini-fab (click)="openQueDialog('Delete', element)" color="warn"
+                        aria-label="Example icon button with a delete icon" *ngIf="this.UserRole == 'admin' || this.UserRole == 'publisher'">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                      &nbsp;
+                      <button mat-mini-fab (click)="viewQuestion(element)" color="basic"
+                        aria-label="Example icon button with a delete icon">
+                        <mat-icon>visibility</mat-icon>
+                      </button>
+                    </td>
+                  </ng-container>
+
+                  <tr mat-header-row *matHeaderRowDef="questionsDisplayedColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: questionsDisplayedColumns"></tr>
+                </table>
+
+                <mat-paginator #paginator3 [pageSize]="10" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons>
+                </mat-paginator>
+              </div>
+            </mat-tab>
+          </mat-tab-group>
+
+          <div *ngIf="this.sideButtons == 'contenthub'">
+            <br />
+            <div style="height: 28px; display: flex; flex-direction: row-reverse">
+              <button mat-button (click)="openContentDialog('Add', { contentNo: this.maxContentNumber })"
+                mat-flat-button color="primary" style="position: absolute" *ngIf="this.UserRole != 'user'" >
+                Add Content
+              </button>
+              <br />
+            </div>
+            <div style="margin-top:10px;display: flex; flex-direction: row-reverse">
+              <button mat-mini-fab (click)="resetFilters()" color="primary">
+              <mat-icon>filter_list</mat-icon>
+            </button>
+            </div>
+            <br />
+
+            <div class="mat-elevation-z8">
+              <table mat-table [dataSource]="contentdataSource" #sort3="matSort" matSort matSortActive="contentNo"
+                matSortDirection="desc">
+
+                <ng-container matColumnDef="contentNo">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    Content No
+                  </th>
+                  <td mat-cell *matCellDef="let element">
+                    {{ element.contentNo }}
+                  </td>
+                </ng-container>
+                <!-- Name Column -->
+                <ng-container matColumnDef="pretext">
+                  <th mat-header-cell *matHeaderCellDef>
+                    <div mat-sort-header *ngIf="this.filterbuttonValue">Pre Text</div>  
+                      <div *ngIf="!this.filterbuttonValue">
+                      <mat-form-field class="filter" floatLabel="never" style="width: 90%;">
+                        <mat-label>Pre Text</mat-label>
+                        <input matInput [formControl]="contentPretextFilter">
+                      </mat-form-field>
+                    </div>                    
+                  </th>
+                  <td mat-cell *matCellDef="let element" style="max-width:250px;">
+                    {{ element.pretext }}
+                  </td>
+                </ng-container>
+
+                <!-- Weight Column -->
+                <ng-container matColumnDef="first">
+                  <th mat-header-cell *matHeaderCellDef>
+                    <div mat-sort-header *ngIf="this.filterbuttonValue">First Sentence</div>  
+                    <div *ngIf="!this.filterbuttonValue">
+                    <mat-form-field class="filter" floatLabel="never" style="width: 90%;">
+                      <mat-label>First Sentence</mat-label>
+                      <input matInput [formControl]="contentFirstFilter">
+                    </mat-form-field>
+                  </div>
+                    
+                  </th>
+                  <td mat-cell *matCellDef="let element" style="max-width:250px;">
+                    {{ element.first }}
+                  </td>
+                </ng-container>
+
+                <!-- Weight Column -->
+                <ng-container matColumnDef="second">
+                  <th mat-header-cell *matHeaderCellDef>
+                    <div mat-sort-header *ngIf="this.filterbuttonValue">Second Sentence</div>  
+                    <div *ngIf="!this.filterbuttonValue">
+                      <mat-form-field class="filter" floatLabel="never" style="width: 90%;">
+                        <mat-label>Second Sentence</mat-label>
+                        <input matInput [formControl]="contentSecondFilter">
+                      </mat-form-field>
+                    </div>   
+                    
+                  </th>
+                  <td mat-cell *matCellDef="let element" style="max-width:250px;">
+                    {{ element.second }}
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="third">
+                  <th mat-header-cell *matHeaderCellDef>
+                    <div mat-sort-header *ngIf="this.filterbuttonValue">Third Sentence</div>  
+                    <div *ngIf="!this.filterbuttonValue">
+                      <mat-form-field class="filter" floatLabel="never" style="width: 90%;">
+                        <mat-label>Third Sentence</mat-label>
+                        <input matInput [formControl]="contentThirdFilter">
+                      </mat-form-field>
+                    </div>   
+                  </th>
+                  <td mat-cell *matCellDef="let element" style="max-width:250px;">
+                    {{ element.third }}
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="imageWidth">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Width</th>
+                  <td mat-cell *matCellDef="let element">
+                    {{ element.imageWidth }}
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="imageHeight">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Height</th>
+                  <td mat-cell *matCellDef="let element">
+                    {{ element.imageHeight }}
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="pageReference">
+                  <th mat-header-cell *matHeaderCellDef>
+                    <div mat-sort-header *ngIf="this.filterbuttonValue">Page Reference</div>  
+                    <div *ngIf="!this.filterbuttonValue">
+                      <mat-form-field class="filter" floatLabel="never" style="width: 90%;">
+                        <mat-label>Page Reference</mat-label>
+                        <input matInput [formControl]="contentPageReferenceFilter">
+                      </mat-form-field>
+                    </div>   
+                  </th>
+                  <td mat-cell *matCellDef="let element" style="max-width:100px;">
+                    {{ element.pageReference }}
+                  </td>
+                </ng-container>
+                <!-- Action Column -->
+                <ng-container matColumnDef="action">
+                  <th mat-header-cell *matHeaderCellDef>Action</th>
+                  <td mat-cell *matCellDef="let element" class="action-link">
+                    <button mat-mini-fab (click)="openContentDialog('Update', element)" color="primary"
+                      aria-label="Example icon button with a delete icon" *ngIf="this.UserRole == 'admin' || this.UserRole == 'publisher'">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="contentDisplayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: contentDisplayedColumns"></tr>
+              </table>
+
+              <mat-paginator #paginator4 [pageSize]="10" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons>
+              </mat-paginator>
+            </div>
+          </div>
+        </div>
+
+
+
+      </div>
+      <!-- /.container-fluid -->
+
+    </div>
+    <!-- End of Main Content -->
+
+    <!-- Footer -->
+    <footer class="sticky-footer bg-white">
+      <div class="container my-auto">
+        <div class="copyright text-center my-auto">
+          <span>Compatee &copy; 2021 | Made with <i class="fas fa-heart iconred"></i> in India</span>
+        </div>
+      </div>
+    </footer>
+    <!-- End of Footer -->
+
+  </div>
+  <!-- End of Content Wrapper -->
+
+</div>
+<!-- End of Page Wrapper -->
+
+<!-- Scroll to Top Button-->
+<a class="scroll-to-top rounded" href="#page-top">
+  <i class="fas fa-angle-up"></i>
+</a>
+
+<!-- Logout Modal-->
+<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+  aria-hidden="true" #logoutModal >
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+        <button class="close" type="button" data-dismiss="modal" aria-label="Close" (click)="logoutPopup(logoutModal)">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal" (click)="logoutPopup(logoutModal)">Cancel</button>
+        <a class="btn btn-primary" (click)="logout()">Logout</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap core JavaScript-->
+<script src="vendor/jquery/jquery.min.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<!-- Core plugin JavaScript-->
+<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+<!-- Custom scripts for all pages-->
+<script src="js/sb-admin-2.min.js"></script>
+
+<!-- Page level plugins -->
+<script src="vendor/chart.js/Chart.min.js"></script>
+
+<!-- Page level custom scripts -->
+<script src="js/demo/chart-area-demo.js"></script>
+<script src="js/demo/chart-pie-demo.js"></script>
