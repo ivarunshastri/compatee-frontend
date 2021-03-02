@@ -1,0 +1,34 @@
+/* You can add global styles to this file, and also import other style files */
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: -40px 0px 0px 0px;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+app-cms {
+  width: 100%;
+}
+
+.mat-progress-bar .mat-progress-bar-fill::after {
+  background-color: #ee2e3d;
+  border-radius: 10px;
+}
+
+app-login{
+  width:100%;
+}
+
+.mat-button{
+  line-height: 36px !important;
+  border-radius: 4px !important;
+}
+
+
+.mat-mini-fab{
+  line-height: 36px !important;
+  border-radius: 50% !important;
+}
